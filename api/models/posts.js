@@ -21,6 +21,11 @@ class Post {
     return posts;
   }
 
+  storeData(rawData) {
+    let data = JSON.stringify(rawData);
+    fs.writeFileSync(PATH, data);
+  }
+
 }
 
 module.exports = Post;
