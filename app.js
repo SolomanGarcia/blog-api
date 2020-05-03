@@ -1,13 +1,20 @@
 const express = require('express');
+const path = require('path');
+const slash = require('slash');
 const app = express();
 const Post = require('./api/models/posts');
+const postsData = new Post();
+
+const string = path.join('uploads', 'post-image');
+slash(string);
+
 var multer = require('multer');
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, './uploads')
   },
   filename: function (req, file, cb) {
-    cb(null, `${file.fieldname}-${Date.now}${getExt(file.mimetype)}`)
+    cb(null, `${file.fieldname}-${Date.now()}${getExt(file.mimetype)}`)
   }
 })
 
@@ -21,15 +28,16 @@ const getExt = (mimeType) => {
 };
 
 var upload = multer({ storage: storage });
-const postsData = new Post();
 
-app.use(express.json());
+
+
 
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   next();
 });
 
+app.use(express.json());
 app.use('/uploads', express.static('uploads'));
 
 app.get('/api/posts', (req, res) => {
@@ -46,7 +54,7 @@ app.get('/api/posts/:post_id', (req, res) => {
   }
 });
 
-app.post('/api/posts', upload.single('post-image'), (req, res) => {
+app.post('/api/posts', upload.single("post-image"), (req, res) => {
   const newPost = {
     'id': `${Date.now()}`,
     'title': req.body.title,
@@ -55,7 +63,7 @@ app.post('/api/posts', upload.single('post-image'), (req, res) => {
     'added_date': `${Date.now()}`
   }
   postsData.add(newPost);
-  res.status(201).send(newPost);;
+  res.status(201).send(newPost);
 });
 
 app.listen(3000, () => console.log('Listening on http://localhost:3000'));
