@@ -1,6 +1,26 @@
 const express = require('express');
 const app = express();
 const Post = require('./api/models/posts');
+var multer = require('multer');
+var storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, './uploads')
+  },
+  filename: function (req, file, cb) {
+    cb(null, `${file.fieldname}-${Date.now}${getExt(file.mimetype)}`)
+  }
+})
+
+const getExt = (mimeType) => {
+  switch(mimeType) {
+    case 'image/png':
+      return '.png';
+    case 'image/jpeg':
+      return '.jpeg';
+  }
+};
+
+var upload = multer({ storage: storage });
 const postsData = new Post();
 
 app.use(express.json());
@@ -26,7 +46,7 @@ app.get('/api/posts/:post_id', (req, res) => {
   }
 });
 
-app.post('/api/posts', (req, res) => {
+app.post('/api/posts', upload.single('post-image'), (req, res) => {
   const newPost = {
     'id': `${Date.now()}`,
     'title': req.body.title,
