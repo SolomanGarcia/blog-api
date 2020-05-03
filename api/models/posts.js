@@ -11,8 +11,10 @@ class Post {
 
   }
 
-  add() {
-
+  add(newPost) {
+    const currentPosts = this.readData();
+    currentPosts.unshift(newPost);
+    this.storeData(currentPosts);
   }
 
   readData() {
