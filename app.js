@@ -1,17 +1,23 @@
 const express = require('express');
 const path = require('path');
-const slash = require('slash');
 const app = express();
 const Post = require('./api/models/posts');
 const postsData = new Post();
 
-const string = path.join('uploads', 'post-image');
+const slash = require('slash');
+
+const string = path.join('foo', 'bar');
+// Unix    => foo/bar
+// Windows => foo\\bar
+
 slash(string);
+// Unix    => foo/bar
+// Windows => foo/bar
 
 var multer = require('multer');
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, './uploads')
+    cb(null, './uploads/');
   },
   filename: function (req, file, cb) {
     cb(null, `${file.fieldname}-${Date.now()}${getExt(file.mimetype)}`)
@@ -59,7 +65,7 @@ app.post('/api/posts', upload.single("post-image"), (req, res) => {
     'id': `${Date.now()}`,
     'title': req.body.title,
     'content': req.body.content,
-    'post_image': req.file.path,
+    'post_image': slash(req.file.path),
     'added_date': `${Date.now()}`
   }
   postsData.add(newPost);
